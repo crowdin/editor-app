@@ -18,5 +18,11 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^19.0.6"
+  },
+  "dependencies": {
+    "@crowdin/crowdin-api-client": "^1.18.2",
+    "electron-json-storage": "^4.5.0",
+    "lodash": "^4.17.21",
+    "node-fetch": "^2.6.7"
   }
 }
