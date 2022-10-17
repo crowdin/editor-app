@@ -1,23 +1,26 @@
 {
-  "name": "electron-quick-start",
+  "name": "crowdin-app",
+  "productName": "Crowdin",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "Crowdin application for translators",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=icon/mac-icon.icns --prune=true --out=release-builds",
+    "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --icon=icon/logo.ico --prune=true --out=release-builds --version-string.CompanyName=Crowdin --version-string.FileDescription=Crowdin --version-string.ProductName=\"Crowdin App\"",
+    "package-linux": "electron-packager . --overwrite --asar=true --platform=linux --arch=x64 --icon=icon/1024x1024.png --prune=true --out=release-builds"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
+    "Crowdin",
+    "Crowdin App",
+    "Crowdin application"
   ],
-  "author": "GitHub",
+  "author": "Crowdin",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^19.0.6"
+    "electron": "^19.0.6",
+    "electron-packager": "^16.0.0"
   },
   "dependencies": {
     "@crowdin/crowdin-api-client": "^1.18.2",

@@ -14,9 +14,10 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     show: false,
     webPreferences: {
+      nodeIntegration: true,
       preload: path.join(__dirname, 'preload.js')
     },
-    icon: path.join(__dirname, 'logo.ico')
+    icon: path.join(__dirname, 'icon/logo.ico')
   });
 
   mainWindow.maximize();
@@ -119,6 +120,7 @@ function saveUserInfo(url) {
 
 function openProject() {
   const { lastProjectUrl } = getUserInfo();
+  // TODO: check if url is fo current user (store userId) and organization
   if (lastProjectUrl) {
     mainWindow.loadURL(getRedirectUrl());
   } else {
@@ -132,6 +134,7 @@ function openProject() {
           return c.name + '=' + c.value;
         }).join('; ');
         console.log('cookiesString', cookiesString);
+        // TODO: get enterprise user projects
         fetch("https://crowdin.com/backend/profile_actions/get_user_projects", {
           "headers": {
             "accept": "*/*",
@@ -151,13 +154,13 @@ function openProject() {
           "body": null,
           "method": "GET"
         }).then(r => r.json()).then(r => {
-          // console.log('r', r);
-          if (!r.projects.length) {
-            // TODO: do something??
+          // TODO: replace with project selection page
+          let link = 'https://crowdin.com/profile';
+          if (r && r.projects.length) {
+            const project = r.projects[0];
+            // ?em
+            link = 'https://crowdin.com/translate/' + project.identifier + '/all';
           }
-          const project = r.projects[0];
-          // const link = 'https://crowdin.com/translate/' + project.identifier + '/all?em';
-          const link = 'https://crowdin.com/translate/' + project.identifier + '/all';
           mainWindow.loadURL(link);
         });
       });
