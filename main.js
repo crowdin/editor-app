@@ -13,8 +13,9 @@ function createWindow () {
   // TODO: show preloader?
   mainWindow = new BrowserWindow({
     show: false,
+    autoHideMenuBar: true,
     webPreferences: {
-      nodeIntegration: true,
+      // nodeIntegration: true,
       preload: path.join(__dirname, 'preload.js')
     },
     icon: path.join(__dirname, 'icon/logo.ico')
@@ -27,6 +28,7 @@ function createWindow () {
 
   mainWindow.webContents.on('will-redirect', (e, url) => {
     if (prevRedirectUrl.includes('jwt/set')) {
+      saveUserInfo(url);
       e.preventDefault();
       openProject();
       prevRedirectUrl = url;
@@ -37,7 +39,6 @@ function createWindow () {
 
   mainWindow.webContents.on('did-navigate', (e, url) => {
     if (url.includes('logout')) {
-      console.log('logour done. clear');
       e.preventDefault();
       clearUserInfo();
       mainWindow.loadURL('https://accounts.crowdin.com');
@@ -50,7 +51,6 @@ function createWindow () {
   });
 
   mainWindow.webContents.on('did-navigate-in-page', (e, url) => {
-    console.log('did redirect', url);
     if (isEditorUrl(url)) {
       saveUserInfo(url);
     }
@@ -64,15 +64,17 @@ function createWindow () {
     .then(() => {
       hiddenWindow.webContents.executeJavaScript(`Array.from(document.querySelectorAll('.workspace-list a.btn-link')).map(node => node.href)`).then(function (result) {
         const { domain } = getUserInfo();
+        let foundLoginForSavedDomain = false;
         const loginTo = find(result, url => {
           if (domain) {
+            foundLoginForSavedDomain = true;
             return url.includes(`?domain=${domain}`);
           }
 
           return !url.includes('?domain=');
         });
 
-        if (loginTo) {
+        if (loginTo && foundLoginForSavedDomain) {
           openProject();
         } else {
           mainWindow.loadURL('https://accounts.crowdin.com').then(() => {
@@ -80,10 +82,10 @@ function createWindow () {
           });
         }
       }).catch(e => {
-        console.log('e1', e);
+        console.log(e);
       });
     }).catch(e => {
-      console.log('e2', e);
+      console.log(e);
   });
 }
 
@@ -111,66 +113,108 @@ app.on('window-all-closed', function () {
 // code. You can also put them in separate files and require them here.
 function saveUserInfo(url) {
   const parsedUrl = new URL(url);
+  const data = {
+    domain: parsedUrl.host.replace('crowdin.com','').replace('.', ''),
+    lastProjectUrl: isEditorUrl(url) ? parsedUrl.pathname : null,
+  };
   // TODO: add encryption?
-  storage.set('user-data', {
-    domain: parsedUrl.host.replace('crowdin.com',''),
-    lastProjectUrl: parsedUrl.pathname,
-  })
+  storage.set('user-data', data);
+  userInfo = data;
+}
+
+function getFetchOptions(csrfToken, cookiesString, domain) {
+  return {
+    "headers": {
+      "accept": "*/*",
+      "accept-language": "uk,uk-UA;q=0.9,en-US;q=0.8,en;q=0.7,ru;q=0.6,fr;q=0.5,he;q=0.4",
+      "pragma": "no-cache",
+      "sec-ch-ua": "\".Not/A)Brand\";v=\"99\", \"Google Chrome\";v=\"103\", \"Chromium\";v=\"103\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": "\"Linux\"",
+      "sec-fetch-dest": "empty",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "same-origin",
+      "x-csrf-token": csrfToken,
+      "x-requested-with": "XMLHttpRequest",
+      "cookie": cookiesString,
+      "Referer": domain ? `https://${domain}.crowdin.com/u` : "https://crowdin.com/profile",
+      "Referrer-Policy": "strict-origin-when-cross-origin"
+    },
+    "body": null,
+    "method": "GET"
+  };
+}
+
+function loadEnterpriseProject(domain, csrfToken, cookiesString) {
+  const baseUrl = `https://${domain}.crowdin.com/backend/`;
+  const fetchOptions = getFetchOptions(csrfToken, cookiesString, domain);
+  fetch(baseUrl + 'app/init', fetchOptions)
+    .then(r => r.json())
+    .then(r => {
+      return fetch(baseUrl + 'projects/list?group_id=' + r.data.root_group.id, fetchOptions).then(r => r.json());
+    })
+    .then(r => {
+      const project = r.data.projects[0];
+      let link = `https://${domain}.crowdin.com/translate/${project.identifier}/all`;
+      mainWindow.loadURL(link);
+    })
+    .catch(e => {
+      showOffline();
+    });
+}
+
+function loadCrowdinProject(csrfToken, cookiesString) {
+  const options = getFetchOptions(csrfToken, cookiesString);
+  fetch("https://crowdin.com/backend/profile_actions/get_user_projects", options).then(r => r.json()).then(r => {
+    // TODO: replace with project selection page
+    let link = 'https://crowdin.com/profile';
+    if (r && r.projects.length) {
+      const project = r.projects[0];
+      // TODO: ?em
+      link = 'https://crowdin.com/translate/' + project.identifier + '/all';
+    }
+    mainWindow.loadURL(link);
+  }).catch(e => showOffline());
+}
+
+function showOffline() {
+  // TODO: show offline page
 }
 
 function openProject() {
-  const { lastProjectUrl } = getUserInfo();
+  const { lastProjectUrl, domain } = getUserInfo();
   // TODO: check if url is fo current user (store userId) and organization
   if (lastProjectUrl) {
     mainWindow.loadURL(getRedirectUrl());
   } else {
-    console.log('no proect');
-    // TODO: shomehow get project url or open editor to select project
-    mainWindow.webContents.session.cookies.get({})
-      .then(cookies => {
-        const csrfToken = find(cookies, c => c.name = 'csrf_token').value;
-        console.log('csrfToken', csrfToken);
-        const cookiesString = cookies.map(c => {
-          return c.name + '=' + c.value;
-        }).join('; ');
-        console.log('cookiesString', cookiesString);
-        // TODO: get enterprise user projects
-        fetch("https://crowdin.com/backend/profile_actions/get_user_projects", {
-          "headers": {
-            "accept": "*/*",
-            "accept-language": "uk,uk-UA;q=0.9,en-US;q=0.8,en;q=0.7,ru;q=0.6,fr;q=0.5,he;q=0.4",
-            "sec-ch-ua": "\".Not/A)Brand\";v=\"99\", \"Google Chrome\";v=\"103\", \"Chromium\";v=\"103\"",
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": "\"Linux\"",
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-origin",
-            "x-csrf-token": csrfToken,
-            "x-requested-with": "XMLHttpRequest",
-            "cookie": cookiesString,
-            "Referer": "https://crowdin.com/profile",
-            "Referrer-Policy": "origin-when-cross-origin"
-          },
-          "body": null,
-          "method": "GET"
-        }).then(r => r.json()).then(r => {
-          // TODO: replace with project selection page
-          let link = 'https://crowdin.com/profile';
-          if (r && r.projects.length) {
-            const project = r.projects[0];
-            // ?em
-            link = 'https://crowdin.com/translate/' + project.identifier + '/all';
-          }
-          mainWindow.loadURL(link);
-        });
+    const cookieDomain = 'https://' + (!domain || domain === '' ? 'crowdin.com' : domain + '.crowdin.com');
+    const hiddenWindow = new BrowserWindow({ width: 1, height: 1, show: false });
+    // load window to load cookies
+    hiddenWindow.loadURL(cookieDomain)
+      .then(() => {
+        setTimeout(() => {
+          mainWindow.webContents.session.cookies.get({ url: cookieDomain })
+            .then(cookies => {
+              const csrfToken = find(cookies, c => c.name === 'csrf_token').value;
+              const cookiesString = cookies.map(c => {
+                return c.name + '=' + c.value;
+              }).join('; ');
+
+              hiddenWindow.close();
+
+              if (!domain) {
+                loadCrowdinProject(csrfToken, cookiesString);
+              } else {
+                loadEnterpriseProject(domain, csrfToken, cookiesString);
+              }
+            });
+        }, 500);
       });
   }
 }
 
 function getRedirectUrl() {
   const { domain, lastProjectUrl } = getUserInfo();
-
-  console.log('lastProjectUrl', lastProjectUrl);
 
   return `https://${domain ? domain + '.' : ''}crowdin.com${lastProjectUrl}`;
 }
@@ -193,7 +237,9 @@ function loadUserInfo() {
       return;
     }
 
-    userInfo = data;
+    // TODO: properly implement this
+    // userInfo = data;
+    userInfo = {};
   })
 }
 
