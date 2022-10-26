@@ -35,6 +35,8 @@
     "appId": "com.crowdin.editor-app",
     "mac": {
       "category": "public.app-category.utilities"
-    }
-  }
+    },
+    "ubuntu": ["github"]
+  },
+  "release": "electron-builder"
 }
