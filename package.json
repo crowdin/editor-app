@@ -1,11 +1,14 @@
 {
   "name": "crowdin-app",
   "productName": "Crowdin",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Crowdin application for translators",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps",
     "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=icon/mac-icon.icns --prune=true --out=release-builds",
     "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --icon=icon/logo.ico --prune=true --out=release-builds --version-string.CompanyName=Crowdin --version-string.FileDescription=Crowdin --version-string.ProductName=\"Crowdin App\"",
     "package-linux": "electron-packager . --overwrite --asar=true --platform=linux --arch=x64 --icon=icon/1024x1024.png --prune=true --out=release-builds"
@@ -20,12 +23,18 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^19.0.6",
+    "electron-builder": "^23.6.0",
     "electron-packager": "^16.0.0"
   },
   "dependencies": {
-    "@crowdin/crowdin-api-client": "^1.18.2",
     "electron-json-storage": "^4.5.0",
     "lodash": "^4.17.21",
     "node-fetch": "^2.6.7"
+  },
+  "build": {
+    "appId": "com.crowdin.editor-app",
+    "mac": {
+      "category": "public.app-category.utilities"
+    }
   }
 }
