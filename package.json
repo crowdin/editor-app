@@ -1,7 +1,7 @@
 {
   "name": "crowdin-app",
   "productName": "Crowdin",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Crowdin application for translators",
   "main": "main.js",
   "scripts": {
@@ -39,6 +39,11 @@
     "linux": {
       "publish": ["github"],
       "icon": "build/icon.icns"
+    },
+    "win": {
+      "icon": "build/icon.icon",
+      "publish": ["github"],
+      "target": ["nsis", "portable"]
     }
   },
   "release": "electron-builder"
