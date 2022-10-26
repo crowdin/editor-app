@@ -36,7 +36,9 @@
     "mac": {
       "category": "public.app-category.utilities"
     },
-    "linux": ["github"]
+    "linux": {
+      "publish": ["github"]
+    }
   },
   "release": "electron-builder"
 }
