@@ -4,7 +4,6 @@
   "version": "0.0.8",
   "description": "Crowdin application for translators",
   "main": "main.js",
-  "artifactName": "${productName}.${ext}",
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
@@ -29,12 +28,15 @@
     "lodash": "^4.17.21"
   },
   "build": {
+    "artifactName": "${productName}.${ext}",
     "appId": "com.crowdin.editor-app",
     "mac": {
       "category": "public.app-category.utilities",
       "publish": [
         "github"
-      ]
+      ],
+      "entitlements": "./build/entitlements.mac.plist",
+      "entitlementsInherit": "./build/entitlements.mac.plist"
     },
     "linux": {
       "publish": [

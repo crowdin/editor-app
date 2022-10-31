@@ -17,6 +17,7 @@ function createWindow () {
     icon: path.join(__dirname, 'icons/128x128.png')
   });
 
+  mainWindow.removeMenu();
   mainWindow.maximize();
   mainWindow.show();
 
