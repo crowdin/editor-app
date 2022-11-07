@@ -6,14 +6,12 @@ const { autoUpdater } = require("electron-updater");
 
 let mainWindow;
 let userInfo = {};
+const appDomain = 'crowdin.com';
 
 function createWindow () {
   mainWindow = new BrowserWindow({
     show: false,
     autoHideMenuBar: true,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    },
     icon: path.join(__dirname, 'icons/128x128.png')
   });
 
@@ -36,15 +34,25 @@ function createWindow () {
 
   mainWindow.webContents.on('did-navigate', (e, url) => {
     if (url.includes('logout')) {
-      e.preventDefault();
       clearUserInfo();
-      mainWindow.loadURL('https://accounts.crowdin.com');
       return;
     }
 
     if (isEditorUrl(url)) {
       saveUserInfo(url);
     }
+  });
+
+  let prevWillNavigateUrl = '';
+
+  mainWindow.webContents.on('will-navigate', (e, url) => {
+    if (prevWillNavigateUrl.includes('/logout') && !isEditorUrl(url) && !url.includes('accounts.')) {
+      e.preventDefault();
+      prevWillNavigateUrl = url;
+      mainWindow.loadURL(`https://accounts.${appDomain}`);
+      return;
+    }
+    prevWillNavigateUrl = url;
   });
 
   mainWindow.webContents.on('did-navigate-in-page', (e, url) => {
@@ -57,15 +65,21 @@ function createWindow () {
 
   const hiddenWindow = new BrowserWindow({ width: 1, height: 1, show: false });
 
-  hiddenWindow.loadURL('https://accounts.crowdin.com')
+  hiddenWindow.loadURL(`https://accounts.${appDomain}`)
     .then(() => {
       hiddenWindow.webContents.executeJavaScript(`Array.from(document.querySelectorAll('.workspace-list a.btn-link')).map(node => node.href)`).then(function (result) {
         const { domain } = getUserInfo();
         let foundLoginForSavedDomain = false;
         const loginTo = find(result, url => {
           if (domain) {
-            foundLoginForSavedDomain = true;
+            if (url.includes(`?domain=${domain}`)) {
+              foundLoginForSavedDomain = true;
+            }
             return url.includes(`?domain=${domain}`);
+          }
+
+          if (!url.includes(`?domain=`) && !domain) {
+            foundLoginForSavedDomain = true;
           }
 
           return !url.includes('?domain=');
@@ -74,7 +88,7 @@ function createWindow () {
         if (loginTo && foundLoginForSavedDomain) {
           openEditor();
         } else {
-          mainWindow.loadURL('https://accounts.crowdin.com').then(() => {
+          mainWindow.loadURL(`https://accounts.${appDomain}`).then(() => {
             hiddenWindow.close();
           });
         }
@@ -108,13 +122,11 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
 function saveUserInfo(url) {
   const parsedUrl = new URL(url);
   const data = {
-    domain: parsedUrl.host.replace('crowdin.com','').replace('.', ''),
-    lastProjectUrl: isEditorUrl(url) ? parsedUrl.pathname : null,
+    domain: parsedUrl.host.replace(appDomain,'').replace('.', ''),
+    lastProjectUrl: isEditorUrl(url) ? `${parsedUrl.pathname}${parsedUrl.search}` : null,
   };
   storage.set('user-data', data);
   userInfo = data;
@@ -122,19 +134,18 @@ function saveUserInfo(url) {
 
 function openEditor() {
   const { lastProjectUrl, domain } = getUserInfo();
+
   if (lastProjectUrl) {
     mainWindow.loadURL(getRedirectUrl());
   } else {
-    // const editorUrl = `https://${!!domain ? domain + '.' : ''}crowdin.com/translate?em`;
-    const editorUrl = `https://${!!domain ? domain + '.' : ''}crowdin.com`;
+    const editorUrl = `https://${!!domain ? domain + '.' : ''}${appDomain}/multilingual?em`;
     mainWindow.loadURL(editorUrl);
   }
 }
 
 function getRedirectUrl() {
   const { domain, lastProjectUrl } = getUserInfo();
-
-  return `https://${domain ? domain + '.' : ''}crowdin.com${lastProjectUrl}`;
+  return `https://${domain ? domain + '.' : ''}${appDomain}${lastProjectUrl}`;
 }
 
 function clearUserInfo() {
@@ -143,8 +154,8 @@ function clearUserInfo() {
 }
 
 function isEditorUrl(url) {
-  return ['translate', 'proofread', 'asset'].some(editorPath => {
-    return url.includes(`crowdin.com/${editorPath}`);
+  return ['translate', 'proofread', 'asset', 'multilingual', 'review'].some(editorPath => {
+    return url.includes(`${appDomain}/${editorPath}`);
   });
 }
 
