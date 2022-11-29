@@ -12,7 +12,7 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     show: false,
     autoHideMenuBar: true,
-    icon: path.join(__dirname, 'icons/128x128.png')
+    icon: path.join(__dirname, 'icons/1024x1024.png')
   });
 
   mainWindow.removeMenu();
