@@ -25,8 +25,8 @@ jobs:
       - name: Build/release Electron app
         env:
           # macOS Code signing certificates
-          CSC_LINK: {{ secrets.mac_certs }}
-          CSC_KEY_PASSWORD: {{ secrets.mac_certs }}
+          CSC_LINK: ${{ secrets.mac_certs }}
+          CSC_KEY_PASSWORD: ${{ secrets.mac_certs }}
         uses: samuelmeuli/action-electron-builder@v1.6.0
         with:
           # GitHub token, automatically provided to the action
