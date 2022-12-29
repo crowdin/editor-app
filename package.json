@@ -1,7 +1,7 @@
 {
   "name": "crowdin-app",
   "productName": "Crowdin",
-  "version": "0.0.15",
+  "version": "0.0.21",
   "description": "Crowdin application for translators",
   "main": "main.js",
   "scripts": {
