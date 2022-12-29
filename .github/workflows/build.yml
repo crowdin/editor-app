@@ -26,14 +26,14 @@ jobs:
         env:
           # macOS Code signing certificates
           CSC_LINK: ${{ secrets.mac_certs }}
-          CSC_KEY_PASSWORD: ${{ secrets.mac_certs }}
+          CSC_KEY_PASSWORD: ""
         uses: samuelmeuli/action-electron-builder@v1.6.0
         with:
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
           github_token: ${{ secrets.github_token }}
           mac_certs: ${{ secrets.mac_certs }}
-          mac_certs_password: "TEST"
+          mac_certs_password: ""
 
           # If the commit is tagged with a version (e.g. "v1.0.0"),
           # release the app after building
