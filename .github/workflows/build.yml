@@ -23,10 +23,6 @@ jobs:
           node-version: 14
 
       - name: Build/release Electron app
-        env:
-          # macOS Code signing certificates
-          CSC_LINK: ${{ secrets.mac_certs }}
-          CSC_KEY_PASSWORD: ""
         uses: samuelmeuli/action-electron-builder@v1.6.0
         with:
           # GitHub token, automatically provided to the action
