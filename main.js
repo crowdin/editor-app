@@ -12,7 +12,10 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     show: false,
     autoHideMenuBar: true,
-    icon: path.join(__dirname, 'icons/1024x1024.png')
+    icon: path.join(__dirname, 'icons/1024x1024.png'),
+    webPreferences: {
+      devTools: false
+    },
   });
 
   mainWindow.removeMenu();
@@ -87,6 +90,7 @@ function createWindow () {
 
         if (loginTo && foundLoginForSavedDomain) {
           openEditor();
+          hiddenWindow.close();
         } else {
           mainWindow.loadURL(`https://accounts.${appDomain}`).then(() => {
             hiddenWindow.close();
@@ -94,10 +98,12 @@ function createWindow () {
         }
       }).catch(e => {
         console.log(e);
+        hiddenWindow.close();
       });
     }).catch(e => {
       console.log(e);
-  });
+      hiddenWindow.close();
+     });
 }
 
 // This method will be called when Electron has finished
