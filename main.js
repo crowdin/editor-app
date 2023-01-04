@@ -147,8 +147,7 @@ function openEditor() {
   if (lastProjectUrl) {
     mainWindow.loadURL(getRedirectUrl());
   } else {
-    const editorUrl = `https://${!!domain ? domain + '.' : ''}${appDomain}/multilingual`;
-    // const editorUrl = `https://${!!domain ? domain + '.' : ''}${appDomain}/multilingual?em`;
+    const editorUrl = `https://${!!domain ? domain + '.' : ''}${appDomain}/multilingual?em`;
     mainWindow.loadURL(editorUrl);
   }
 }
