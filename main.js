@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, Menu } = require('electron')
 const path = require('path')
 const { find } = require('lodash');
 const storage = require('electron-json-storage');
@@ -11,14 +11,17 @@ const appDomain = 'crowdin.com';
 function createWindow () {
   mainWindow = new BrowserWindow({
     show: false,
-    autoHideMenuBar: true,
     icon: path.join(__dirname, 'icons/1024x1024.png'),
     webPreferences: {
-      devTools: false
+      devTools: false,
     },
   });
 
-  mainWindow.removeMenu();
+  if (process.platform === 'darwin') {
+    buildMenu();
+  } else {
+    mainWindow.removeMenu();
+  }
   mainWindow.maximize();
   mainWindow.show();
 
@@ -178,4 +181,71 @@ function loadUserInfo() {
 
 function getUserInfo() {
   return userInfo;
+}
+
+function buildMenu() {
+  const template = [
+    {
+      label: app.name,
+      submenu: [
+        { role: 'about' },
+        { type: 'separator' },
+        { role: 'services' },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideOthers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' }
+      ]
+    },
+    {
+      label: 'File',
+      submenu: [
+        { role: 'close' },
+      ]
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        { role: 'pasteAndMatchStyle' },
+        { role: 'delete' },
+        { role: 'selectAll' },
+      ]
+    },
+    {
+      label: 'View',
+      submenu: [
+        /* { role: 'reload' },
+        { role: 'forceReload' },
+        { role: 'toggleDevTools' }, */
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
+      ]
+    },
+    {
+      label: 'Window',
+      submenu: [
+        { role: 'minimize' },
+        { role: 'zoom' },
+        { type: 'separator' },
+        { role: 'front' },
+        { type: 'separator' },
+        { role: 'window' },
+      ]
+    },
+  ];
+
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
 }
