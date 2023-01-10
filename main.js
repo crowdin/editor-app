@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu } = require('electron')
+const { app, BrowserWindow, Menu, MenuItem } = require('electron')
 const path = require('path')
 const { find } = require('lodash');
 const storage = require('electron-json-storage');
@@ -24,6 +24,19 @@ function createWindow () {
   }
   mainWindow.maximize();
   mainWindow.show();
+
+  mainWindow.webContents.on('context-menu', (_, props) => {
+    const menu = new Menu();
+    if (props.isEditable) {
+      menu.append(new MenuItem({ label: 'Cut', role: 'cut' }));
+      menu.append(new MenuItem({ label: 'Copy', role: 'copy' }));
+      menu.append(new MenuItem({ label: 'Paste', role: 'paste' }));
+      menu.popup();
+    } else if (props.selectionText && props.selectionText.length) {
+      menu.append(new MenuItem({ label: 'Copy', role: 'copy' }));
+      menu.popup();
+    }
+  });
 
   let prevRedirectUrl = '';
 
