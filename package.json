@@ -1,7 +1,7 @@
 {
   "name": "crowdin-app",
   "productName": "Crowdin",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "description": "Crowdin application for translators",
   "main": "main.js",
   "scripts": {
@@ -53,8 +53,7 @@
         "github"
       ],
       "target": [
-        "nsis",
-        "portable"
+        "nsis"
       ]
     }
   },
