@@ -11,7 +11,7 @@ const appDomain = 'crowdin.com';
 function createWindow () {
   mainWindow = new BrowserWindow({
     show: false,
-    icon: path.join(__dirname, 'icons/1024x1024.png'),
+    icon: path.join(__dirname, 'icons/128x128.png'),
     webPreferences: {
       devTools: false,
     },
