@@ -1,7 +1,7 @@
 {
   "name": "crowdin-app",
   "productName": "Crowdin",
-  "version": "0.0.34",
+  "version": "0.1.0",
   "description": "Crowdin application for translators",
   "main": "main.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "dist": "electron-builder",
     "postinstall": "electron-builder install-app-deps"
   },
-  "repository": "https://github.com/dimonzz/editor-app-debug",
+  "repository": "https://github.com/crowdin/editor-app",
   "keywords": [
     "Crowdin",
     "Crowdin App",
