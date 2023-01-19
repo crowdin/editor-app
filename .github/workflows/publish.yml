@@ -1,0 +1,42 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: Import Apple API key for app notarization on macOS
+        if: startsWith(matrix.os, 'macos')
+        run: |
+          mkdir -p ~/private_keys/
+          echo '${{ secrets.API_KEY }}' > ~/private_keys/AuthKey_${{ secrets.API_KEY_ID }}.p8
+
+      - name: Build/release Electron app
+        uses: paneron/action-electron-builder@v1.8.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          windows_certs: ${{ secrets.WINDOWS_CERTS }}
+          windows_certs_password: ${{ secrets.WINDOWS_CERTS_PASSWORD }}
+          mac_certs: ${{ secrets.MAC_CERTS }}
+          mac_certs_password: ""
+          release: true
+        env:
+          # macOS notarization API key
+          API_KEY_ID: ${{ secrets.API_KEY_ID }}
+          API_KEY_ISSUER_ID: ${{ secrets.API_KEY_ISSUER_ID }}

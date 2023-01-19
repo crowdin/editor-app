@@ -1,9 +1,13 @@
+# Please see the documentation for all configuration options:
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
 version: 2
 updates:
 - package-ecosystem: npm
   directory: "/"
   schedule:
-    interval: daily
-    time: "13:00"
-  open-pull-requests-limit: 99
+    interval: "weekly"
   versioning-strategy: increase
+  ignore:
+    - dependency-name: "*" #All the dependency it's going to ignore for major update
+      update-types: [ "version-update:semver-major" ]
