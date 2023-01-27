@@ -197,7 +197,8 @@ function openSsoWindow(url) {
   });
 
   ssoWindow.on('close', () => {
-    mainWindow.webContents.executeJavaScript("$('.loadmask, .loadmask-msg').remove()");
+    mainWindow.webContents.executeJavaScript("$('.loadmask, .loadmask-msg').remove()")
+        .catch(e => {});
   })
 }
 
