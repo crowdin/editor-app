@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, MenuItem } = require('electron')
+const { app, BrowserWindow, Menu, MenuItem, shell } = require('electron')
 const path = require('path')
 const { find } = require('lodash');
 const storage = require('electron-json-storage');
@@ -25,6 +25,13 @@ function createWindow () {
   mainWindow.maximize();
   mainWindow.show();
 
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('https:')) {
+      shell.openExternal(url);
+    }
+    return { action: 'deny' };
+  });
+
   mainWindow.webContents.on('context-menu', (_, props) => {
     const menu = new Menu();
     if (props.isEditable) {
@@ -41,6 +48,13 @@ function createWindow () {
   let prevRedirectUrl = '';
 
   mainWindow.webContents.on('will-redirect', (e, url) => {
+    if (prevWillNavigateUrl.includes('accounts.') && prevWillNavigateUrl.includes('/authorize/')) {
+      e.preventDefault();
+      openSsoWindow(url);
+      prevRedirectUrl = url;
+      return;
+    }
+
     if (prevRedirectUrl.includes('jwt/set')) {
       saveUserInfo(url);
       e.preventDefault();
@@ -65,6 +79,17 @@ function createWindow () {
   let prevWillNavigateUrl = '';
 
   mainWindow.webContents.on('will-navigate', (e, url) => {
+    if (url === 'https://crowdin.com' || url === 'https://crowdin.com/') {
+      e.preventDefault();
+      return;
+    }
+
+    if (url.includes('cloudflare')) {
+      e.preventDefault();
+      shell.openExternal(url);
+      return;
+    }
+
     if (prevWillNavigateUrl.includes('/logout') && !isEditorUrl(url) && !url.includes('accounts.')) {
       e.preventDefault();
       prevWillNavigateUrl = url;
@@ -152,6 +177,29 @@ function saveUserInfo(url) {
   };
   storage.set('user-data', data);
   userInfo = data;
+}
+
+function openSsoWindow(url) {
+  const ssoWindow = new BrowserWindow({
+    parent: mainWindow,
+  });
+  ssoWindow.loadURL(url);
+
+  let ssoWindowPrevRedirectUrl = '';
+  ssoWindow.webContents.on('will-redirect', (e, url) => {
+    if (ssoWindowPrevRedirectUrl.includes('jwt/set')) {
+      saveUserInfo(url);
+      e.preventDefault();
+      openEditor();
+      ssoWindow.close();
+    }
+    ssoWindowPrevRedirectUrl = url;
+  });
+
+  ssoWindow.on('close', () => {
+    mainWindow.webContents.executeJavaScript("$('.loadmask, .loadmask-msg').remove()")
+        .catch(e => {});
+  })
 }
 
 function openEditor() {
