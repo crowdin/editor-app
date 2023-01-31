@@ -79,6 +79,13 @@ function createWindow () {
   let prevWillNavigateUrl = '';
 
   mainWindow.webContents.on('will-navigate', (e, url) => {
+    if (prevWillNavigateUrl.includes('/logout') && !isEditorUrl(url) && !url.includes('accounts.')) {
+      e.preventDefault();
+      prevWillNavigateUrl = url;
+      mainWindow.loadURL(`https://accounts.${appDomain}`);
+      return;
+    }
+
     if (url === 'https://crowdin.com' || url === 'https://crowdin.com/') {
       e.preventDefault();
       return;
@@ -90,12 +97,6 @@ function createWindow () {
       return;
     }
 
-    if (prevWillNavigateUrl.includes('/logout') && !isEditorUrl(url) && !url.includes('accounts.')) {
-      e.preventDefault();
-      prevWillNavigateUrl = url;
-      mainWindow.loadURL(`https://accounts.${appDomain}`);
-      return;
-    }
     prevWillNavigateUrl = url;
   });
 
