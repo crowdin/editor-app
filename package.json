@@ -1,7 +1,7 @@
 {
   "name": "crowdin-app",
   "productName": "Crowdin",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Crowdin application for translators",
   "main": "main.js",
   "scripts": {
@@ -48,6 +48,7 @@
       "icon": "build/icon.icns"
     },
     "win": {
+      "artifactName": "${productName}-Setup.${ext}",
       "icon": "build/icon.icon",
       "publish": [
         "github"
