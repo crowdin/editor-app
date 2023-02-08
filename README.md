@@ -19,20 +19,21 @@ The app allows for quick and easy translation of files and content, with a user-
 ## Installation
 
 ### Linux
+
 [Download Crowdin.AppImage](https://github.com/crowdin/editor-app/releases/latest/download/Crowdin-Setup.exe).
-Make it  [executable](https://discourse.appimage.org/t/how-to-run-an-appimage/80):
-```
+Make it [executable](https://discourse.appimage.org/t/how-to-run-an-appimage/80):
+```console
 chmod +x Crowdin.AppImage
 ```
 Run it with double-click.
 
 ### MacOS
 
-[Download Crowdin.dmg](https://github.com/crowdin/editor-app/releases/latest/download/Crowdin.dmg). Right (control) click the Crowdin icon, select Open and then Open again. You can drag the icon into your Applications directory if you want.
+[Download Crowdin.dmg](https://github.com/crowdin/editor-app/releases/latest/download/Crowdin.dmg). Right (control) click the Crowdin icon, select _Open_, and then _Open_ again. You can drag the icon into your Applications directory if you want.
 
 ### Windows
 
-[Download Crowdin-Setup.exe](https://github.com/crowdin/editor-app/releases/latest/download/Crowdin-Setup.exe). Double-click the executable, wait until app is installed. App will start automatically after installation. Next time you can run app with shortcut on the Desktop or from System menu.
+[Download Crowdin-Setup.exe](https://github.com/crowdin/editor-app/releases/latest/download/Crowdin-Setup.exe). Double-click the executable, and wait until the app is installed. The app will start automatically after installation. Next time you can run the app with a shortcut on the Desktop or from the System menu.
 
 ## Seeking Assistance
 
