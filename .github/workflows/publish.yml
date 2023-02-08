@@ -44,3 +44,9 @@ jobs:
           # macOS notarization API key
           API_KEY_ID: ${{ secrets.API_KEY_ID }}
           API_KEY_ISSUER_ID: ${{ secrets.API_KEY_ISSUER_ID }}
+
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: error-logs
+          path: notarization-error.log
