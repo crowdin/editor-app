@@ -3,7 +3,7 @@
 # Crowdin Editor App
 
 [![Build](https://github.com/crowdin/editor-app/actions/workflows/build.yml/badge.svg)](https://github.com/crowdin/editor-app/actions/workflows/build.yml)
-![GitHub all releases](https://img.shields.io/github/downloads/crowdin/editor-app/total?cacheSeconds=500)
+[![GitHub all releases](https://img.shields.io/github/downloads/crowdin/editor-app/total?cacheSeconds=500)](https://github.com/crowdin/editor-app/releases)
 
 The Crowdin Editor App is a standalone application that can be installed on Linux, macOS, or Windows computers, providing users with a convenient and efficient way to access the Crowdin Editor.
 
@@ -21,7 +21,7 @@ The app allows for quick and easy translation of files and content, with a user-
 
 ### Linux
 
-[Download Crowdin.AppImage](https://github.com/crowdin/editor-app/releases/latest/download/Crowdin-Setup.exe).
+[Download Crowdin.AppImage](https://github.com/crowdin/editor-app/releases/latest/download/Crowdin.AppImage).
 Make it [executable](https://discourse.appimage.org/t/how-to-run-an-appimage/80):
 ```console
 chmod +x Crowdin.AppImage
