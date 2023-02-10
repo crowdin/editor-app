@@ -3,6 +3,7 @@
 # Crowdin Editor App
 
 [![Build](https://github.com/crowdin/editor-app/actions/workflows/build.yml/badge.svg)](https://github.com/crowdin/editor-app/actions/workflows/build.yml)
+![GitHub all releases](https://img.shields.io/github/downloads/crowdin/editor-app/total?cacheSeconds=500)
 
 The Crowdin Editor App is a standalone application that can be installed on Linux, macOS, or Windows computers, providing users with a convenient and efficient way to access the Crowdin Editor.
 
