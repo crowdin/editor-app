@@ -6,7 +6,7 @@ updates:
 - package-ecosystem: npm
   directory: "/"
   schedule:
-    interval: "weekly"
+    interval: "monthly"
   versioning-strategy: increase
   ignore:
     - dependency-name: "*" #All the dependency it's going to ignore for major update
